@@ -118,45 +118,23 @@ endif()
 # APP_LIBRARIES if it is really specific to OpenSSL?
 
 # openssl
-# include(CheckSymbolExists)
-# set(HAVE_OPENSSL    ${OPENSSL_FOUND})
-# if(OPENSSL_FOUND)
-#   set(OPENSSL_INCLUDE_DIRS  ${OPENSSL_INCLUDE_DIR})
-#   cmake_push_check_state()
-#   set(CMAKE_REQUIRED_INCLUDES   "${OPENSSL_INCLUDE_DIR}")
-#   set(CMAKE_REQUIRED_LIBRARIES  "${OPENSSL_LIBRARIES}")
-#   if(WIN32)
-#     set(CMAKE_REQUIRED_LIBRARIES "${CMAKE_REQUIRED_LIBRARIES}" "ws2_32" "bcrypt")
-#   endif()
-#   cmake_pop_check_state()
-# else()
-#   set(OPENSSL_INCLUDE_DIRS  "")
-#   set(OPENSSL_LIBRARIES     "")
-# endif()
-# find_package(OpenSSL)
-message(STATUS "This source is built by MacMini")
+include(CheckSymbolExists)
+set(HAVE_OPENSSL    ${OPENSSL_FOUND})
+if(OPENSSL_FOUND)
+  set(OPENSSL_INCLUDE_DIRS  ${OPENSSL_INCLUDE_DIR})
+  cmake_push_check_state()
+  set(CMAKE_REQUIRED_INCLUDES   "${OPENSSL_INCLUDE_DIR}")
+  set(CMAKE_REQUIRED_LIBRARIES  "${OPENSSL_LIBRARIES}")
+  if(WIN32)
+    set(CMAKE_REQUIRED_LIBRARIES "${CMAKE_REQUIRED_LIBRARIES}" "ws2_32" "bcrypt")
+  endif()
+  cmake_pop_check_state()
+else()
+  set(OPENSSL_INCLUDE_DIRS  "")
+  set(OPENSSL_LIBRARIES     "")
+endif()
 
-set(ROOT_DIR "/usr/local/Cellar")
-set(OPENSSL_INCLUDE_DIRS  ${ROOT_DIR}/openssl@1.1/include)
-set(OPENSSL_LIBRARIES     
-  ${ROOT_DIR}/openssl@1.1/lib/libcrypto.a
-  ${ROOT_DIR}/openssl@1.1/lib/libssl.a
-)
-
-# find_package(Boost 1.54.0 REQUIRED system thread)
-# set(CMAKE_INCLUDE_PATH ${CMAKE_INCLUDE_PATH} "/usr/local/Cellar/boost@1.76/include")
-# set(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH} "/usr/local/Cellar/boost@1.76/lib")
-set(Boost_INCLUDE_DIRS ${ROOT_DIR}/boost@1.76/include)
-set(Boost_LIBRARIES 
-  ${ROOT_DIR}/boost@1.76/lib/libboost_system-mt.a
-  ${ROOT_DIR}/boost@1.76/lib/libboost_thread-mt.a
-)
-
-set(LIBNGHTTP2_INCLUDE_DIRS ${ROOT_DIR}/libnghttp2/1.50.0/include)
-set(LIBNGHTTP2_LIBRARIES 
-  ${ROOT_DIR}/libnghttp2/1.50.0/lib/libnghttp2.a
-)
-
+find_package(Boost 1.54.0 REQUIRED system thread)
 
 # Checks for header files.
 include(CheckIncludeFile)
@@ -351,7 +329,7 @@ install(FILES README.rst DESTINATION "${CMAKE_INSTALL_DOCDIR}")
 add_subdirectory(lib)
 #add_subdirectory(lib/includes)
 add_subdirectory(third-party)
-# add_subdirectory(src/includes)
+#add_subdirectory(src/includes)
 #add_subdirectory(tests/testdata)
 
 string(TOUPPER "${CMAKE_BUILD_TYPE}" _build_type)
@@ -375,5 +353,3 @@ message(STATUS "summary of build options:
       Boost::System:  ${Boost_SYSTEM_LIBRARY}
       Boost::Thread:  ${Boost_THREAD_LIBRARY}
 ")
-
-add_subdirectory(client)
