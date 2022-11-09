@@ -318,32 +318,32 @@ Receive server push and enable SSL/TLS
       session sess(io_service, tls, "localhost", "3000");
 
       sess.on_connect([&sess](tcp::resolver::iterator endpoint_it) {
-	boost::system::error_code ec;
+        boost::system::error_code ec;
 
-	auto req = sess.submit(ec, "GET", "http://localhost:3000/");
+        auto req = sess.submit(ec, "GET", "http://localhost:3000/");
 
-	req->on_response([&sess](const response &res) {
-	  std::cerr << "response received!" << std::endl;
-	  res.on_data([&sess](const uint8_t *data, std::size_t len) {
-	    std::cerr.write(reinterpret_cast<const char *>(data), len);
-	    std::cerr << std::endl;
-	  });
-	});
+        req->on_response([&sess](const response &res) {
+          std::cerr << "response received!" << std::endl;
+          res.on_data([&sess](const uint8_t *data, std::size_t len) {
+            std::cerr.write(reinterpret_cast<const char *>(data), len);
+            std::cerr << std::endl;
+          });
+        });
 
-	req->on_push([](const request &push) {
-	  std::cerr << "push request received!" << std::endl;
-	  push.on_response([](const response &res) {
-	    std::cerr << "push response received!" << std::endl;
-	    res.on_data([](const uint8_t *data, std::size_t len) {
-	      std::cerr.write(reinterpret_cast<const char *>(data), len);
-	      std::cerr << std::endl;
-	    });
-	  });
-	});
+        req->on_push([](const request &push) {
+          std::cerr << "push request received!" << std::endl;
+          push.on_response([](const response &res) {
+            std::cerr << "push response received!" << std::endl;
+            res.on_data([](const uint8_t *data, std::size_t len) {
+              std::cerr.write(reinterpret_cast<const char *>(data), len);
+              std::cerr << std::endl;
+            });
+          });
+        });
       });
 
       sess.on_error([](const boost::system::error_code &ec) {
-	std::cerr << "error: " << ec.message() << std::endl;
+	      std::cerr << "error: " << ec.message() << std::endl;
       });
 
       io_service.run();
@@ -390,34 +390,34 @@ Multiple concurrent requests
       session sess(io_service, "localhost", "3000");
 
       sess.on_connect([&sess](tcp::resolver::iterator endpoint_it) {
-	boost::system::error_code ec;
+        boost::system::error_code ec;
 
-	auto printer = [](const response &res) {
-	  res.on_data([](const uint8_t *data, std::size_t len) {
-	    std::cerr.write(reinterpret_cast<const char *>(data), len);
-	    std::cerr << std::endl;
-	  });
-	};
+        auto printer = [](const response &res) {
+          res.on_data([](const uint8_t *data, std::size_t len) {
+            std::cerr.write(reinterpret_cast<const char *>(data), len);
+            std::cerr << std::endl;
+          });
+        };
 
-	std::size_t num = 3;
-	auto count = std::make_shared<int>(num);
+        std::size_t num = 3;
+        auto count = std::make_shared<int>(num);
 
-	for (std::size_t i = 0; i < num; ++i) {
-	  auto req = sess.submit(ec, "GET",
-				 "http://localhost:3000/" + std::to_string(i + 1));
+        for (std::size_t i = 0; i < num; ++i) {
+          auto req = sess.submit(ec, "GET",
+              "http://localhost:3000/" + std::to_string(i + 1));
 
-	  req->on_response(printer);
-	  req->on_close([&sess, count](uint32_t error_code) {
-	    if (--*count == 0) {
-	      // shutdown session after |num| requests were done.
-	      sess.shutdown();
-	    }
-	  });
-	}
+          req->on_response(printer);
+          req->on_close([&sess, count](uint32_t error_code) {
+            if (--*count == 0) {
+              // shutdown session after |num| requests were done.
+              sess.shutdown();
+            }
+          });
+        }
       });
 
       sess.on_error([](const boost::system::error_code &ec) {
-	std::cerr << "error: " << ec.message() << std::endl;
+	      std::cerr << "error: " << ec.message() << std::endl;
       });
 
       io_service.run();
